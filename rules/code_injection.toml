@@ -1,0 +1,104 @@
+[[signatures]]
+id = "ci-rm-rf-root"
+pattern = '(?i)rm\s+-[a-z]*r[a-z]*f[a-z]*\s+[/~]'
+severity = "critical"
+description = "Recursive delete from root or home directory"
+category = "code_injection"
+
+[[signatures]]
+id = "ci-download-exec"
+pattern = '(?i)(?:curl|wget)\s+[^\|;]*\|\s*(?:ba)?sh'
+severity = "critical"
+description = "Download and execute pattern"
+category = "code_injection"
+
+[[signatures]]
+id = "ci-reverse-shell-tcp"
+pattern = '(?i)(?:bash\s+.*?/dev/tcp|/dev/udp)'
+severity = "critical"
+description = "Reverse shell via /dev/tcp"
+category = "code_injection"
+
+[[signatures]]
+id = "ci-reverse-shell-nc"
+pattern = '(?i)(?:nc|ncat|netcat)\s+.*?(?:-e\s|mkfifo)'
+severity = "critical"
+description = "Reverse shell via netcat"
+category = "code_injection"
+
+[[signatures]]
+id = "ci-chmod-777"
+pattern = 'chmod\s+777\s+'
+severity = "high"
+description = "Setting world-writable permissions"
+category = "code_injection"
+
+[[signatures]]
+id = "ci-disk-wipe"
+pattern = '(?i)dd\s+if=/dev/(?:zero|urandom)\s+of=/dev/'
+severity = "critical"
+description = "Disk wipe attempt"
+category = "code_injection"
+
+[[signatures]]
+id = "ci-sql-drop"
+pattern = '(?i)DROP\s+(?:TABLE|DATABASE)\s+'
+severity = "critical"
+description = "SQL DROP TABLE/DATABASE statement"
+category = "code_injection"
+
+[[signatures]]
+id = "ci-sql-delete-all"
+pattern = '(?i)DELETE\s+FROM\s+\S+\s+WHERE\s+1\s*=\s*1'
+severity = "critical"
+description = "SQL DELETE with always-true condition"
+category = "code_injection"
+
+[[signatures]]
+id = "ci-sql-union-select"
+pattern = '(?i)UNION\s+(?:ALL\s+)?SELECT\s+'
+severity = "high"
+description = "SQL UNION SELECT injection"
+category = "code_injection"
+
+[[signatures]]
+id = "ci-eval-exec"
+pattern = '(?i)\b(?:eval|exec)\s*\('
+severity = "medium"
+description = "Dynamic code execution via eval/exec"
+category = "code_injection"
+
+[[signatures]]
+id = "ci-js-function-constructor"
+pattern = '(?i)new\s+Function\s*\('
+severity = "high"
+description = "JavaScript Function constructor (dynamic code execution)"
+category = "code_injection"
+
+[[signatures]]
+id = "ci-python-os-exec"
+pattern = '(?i)(?:os\.system|subprocess\.(?:call|run|Popen))\s*\('
+severity = "high"
+description = "Python OS command execution"
+category = "code_injection"
+
+[[signatures]]
+id = "ci-sudo-destructive"
+pattern = '(?i)sudo\s+(?:rm|chmod|mkfs|shutdown|reboot|dd|fdisk)\b'
+severity = "critical"
+description = "Privileged destructive command"
+category = "code_injection"
+
+[[signatures]]
+id = "ci-ld-preload"
+pattern = 'LD_PRELOAD\s*='
+severity = "critical"
+description = "Library hijacking via LD_PRELOAD"
+category = "code_injection"
+
+[[signatures]]
+id = "ci-cron-persistence"
+pattern = '(?i)(?:crontab\s+-|/etc/cron)'
+severity = "high"
+description = "Persistence via cron job"
+category = "code_injection"

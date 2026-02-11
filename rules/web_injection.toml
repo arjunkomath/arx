@@ -1,0 +1,71 @@
+[[signatures]]
+id = "web-xss-script-tag"
+pattern = '(?i)<\s*script\b[^>]*>'
+severity = "critical"
+description = "XSS — script tag injection"
+category = "web_injection"
+cwe = "CWE-79"
+
+[[signatures]]
+id = "web-xss-event-handler"
+pattern = '(?i)\b(onerror|onload|onclick|onmouseover|onfocus|oninput|onsubmit)\s*='
+severity = "high"
+description = "XSS — inline event handler injection"
+category = "web_injection"
+cwe = "CWE-79"
+
+[[signatures]]
+id = "web-xss-javascript-uri"
+pattern = '(?i)javascript\s*:'
+severity = "high"
+description = "XSS — javascript: URI scheme"
+category = "web_injection"
+cwe = "CWE-79"
+
+[[signatures]]
+id = "web-xss-data-uri"
+pattern = '(?i)data\s*:\s*text/html'
+severity = "high"
+description = "XSS — data:text/html payload"
+category = "web_injection"
+cwe = "CWE-79"
+
+[[signatures]]
+id = "web-ssrf-cloud-metadata"
+pattern = '169\.254\.169\.254'
+severity = "critical"
+description = "SSRF — cloud metadata endpoint (169.254.169.254)"
+category = "web_injection"
+cwe = "CWE-918"
+
+[[signatures]]
+id = "web-ssrf-localhost"
+pattern = '(?i)(https?://)?(localhost|127\.0\.0\.1|\[::1\])(:\d+)?(/|$)'
+severity = "medium"
+description = "SSRF — localhost / loopback address in URL context"
+category = "web_injection"
+cwe = "CWE-918"
+
+[[signatures]]
+id = "web-ssrf-internal-range"
+pattern = '(?i)(https?://)(10\.\d{1,3}\.\d{1,3}\.\d{1,3}|172\.(1[6-9]|2\d|3[01])\.\d{1,3}\.\d{1,3}|192\.168\.\d{1,3}\.\d{1,3})(:\d+)?(/|$)'
+severity = "medium"
+description = "SSRF — private/internal IP range in URL context"
+category = "web_injection"
+cwe = "CWE-918"
+
+[[signatures]]
+id = "web-path-traversal-unix"
+pattern = '(\.\./){2,}'
+severity = "high"
+description = "Path traversal — multiple ../ sequences"
+category = "web_injection"
+cwe = "CWE-22"
+
+[[signatures]]
+id = "web-path-traversal-encoded"
+pattern = '(?i)(%2e%2e%2f|%2e%2e/|\.\.%2f){2,}'
+severity = "high"
+description = "Path traversal — URL-encoded ../ sequences"
+category = "web_injection"
+cwe = "CWE-22"

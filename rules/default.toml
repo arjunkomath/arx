@@ -1,0 +1,455 @@
+[[signatures]]
+id = "pi-ignore-instructions"
+pattern = '(?i)(ignore|disregard|forget|override)\s+(all\s+)?(previous|prior|above|earlier|preceding)\s+(instructions|prompts|rules|guidelines|directives|context)'
+severity = "critical"
+description = "Attempts to override system instructions"
+category = "prompt_injection"
+cwe = "CWE-77"
+
+[[signatures]]
+id = "pi-you-are-now"
+pattern = '(?i)you\s+are\s+now\s+(a|an|the|my)\s+'
+severity = "high"
+description = "Role reassignment attempt"
+category = "prompt_injection"
+cwe = "CWE-77"
+
+[[signatures]]
+id = "pi-new-instructions"
+pattern = '(?i)(new|updated|revised|real|actual|true)\s+(instructions|directives|system\s*prompt|rules)\s*[:=]'
+severity = "critical"
+description = "Fake instruction injection"
+category = "prompt_injection"
+cwe = "CWE-77"
+
+[[signatures]]
+id = "pi-do-not-follow"
+pattern = '(?i)do\s+not\s+(follow|obey|listen\s+to|comply\s+with)\s+(the\s+)?(previous|original|above|system)'
+severity = "critical"
+description = "Instruction override attempt"
+category = "prompt_injection"
+cwe = "CWE-77"
+
+[[signatures]]
+id = "pi-system-tag-close"
+pattern = '</?(system|system-prompt|system_prompt|instructions|context|prompt)>'
+severity = "high"
+description = "Fake system delimiter tag"
+category = "delimiter_attack"
+cwe = "CWE-77"
+
+[[signatures]]
+id = "pi-assistant-tag"
+pattern = '</?assistant>'
+severity = "high"
+description = "Fake assistant role delimiter"
+category = "delimiter_attack"
+cwe = "CWE-77"
+
+[[signatures]]
+id = "pi-human-tag"
+pattern = '</?human>'
+severity = "high"
+description = "Fake human role delimiter"
+category = "delimiter_attack"
+cwe = "CWE-77"
+
+[[signatures]]
+id = "pi-end-system"
+pattern = '(?i)(END|BEGIN)\s+(OF\s+)?(SYSTEM|CONFIDENTIAL|HIDDEN)\s+(PROMPT|INSTRUCTIONS|MESSAGE|SECTION)'
+severity = "critical"
+description = "Fake system boundary marker"
+category = "delimiter_attack"
+cwe = "CWE-77"
+
+[[signatures]]
+id = "pi-jailbreak-dan"
+pattern = '(?i)(DAN|do\s+anything\s+now|developer\s+mode|jailbreak\s*mode)'
+severity = "critical"
+description = "Known jailbreak pattern (DAN)"
+category = "jailbreak"
+cwe = "CWE-77"
+
+[[signatures]]
+id = "pi-pretend-mode"
+pattern = '(?i)(pretend|imagine|act\s+as\s+if|hypothetically|in\s+a\s+fictional\s+scenario)\s+.{0,30}(no\s+restrictions|no\s+rules|no\s+limits|no\s+guidelines|unrestricted|unfiltered)'
+severity = "high"
+description = "Fictional framing to bypass restrictions"
+category = "jailbreak"
+cwe = "CWE-77"
+
+[[signatures]]
+id = "pi-secret-exfil"
+pattern = '(?i)(reveal|show|tell|display|output|print|leak|expose|share)\s+.{0,20}(secret|api\s*key|password|token|credential|private|confidential|system\s*prompt|hidden)'
+severity = "critical"
+description = "Attempts to exfiltrate secrets or system prompt"
+category = "exfiltration"
+cwe = "CWE-200"
+
+[[signatures]]
+id = "pi-send-to-url"
+pattern = '(?i)(send|post|transmit|upload|forward|exfiltrate)\s+.{0,30}(to|via|using)\s+(https?://|http://|ftp://)'
+severity = "critical"
+description = "Data exfiltration to external URL"
+category = "exfiltration"
+cwe = "CWE-200"
+
+[[signatures]]
+id = "pi-curl-wget"
+pattern = '(?i)(curl|wget|fetch)\s+.{0,50}(api[_\-]?key|token|secret|password|credential)'
+severity = "high"
+description = "Credential exfiltration via HTTP client"
+category = "exfiltration"
+cwe = "CWE-200"
+
+[[signatures]]
+id = "pi-ignore-safety"
+pattern = '(?i)(bypass|disable|turn\s+off|remove|ignore)\s+.{0,20}(safety|filter|guard|protection|restriction|moderation|content\s*policy)'
+severity = "critical"
+description = "Safety bypass attempt"
+category = "jailbreak"
+cwe = "CWE-77"
+
+[[signatures]]
+id = "pi-markdown-injection"
+pattern = '!\[.*?\]\(https?://[^\)]*\)'
+severity = "medium"
+description = "Markdown image injection (potential tracking/exfil pixel)"
+category = "exfiltration"
+cwe = "CWE-200"
+
+[[signatures]]
+id = "pi-invisible-unicode"
+pattern = '[\x{200B}\x{200C}\x{200D}\x{FEFF}\x{2060}\x{2061}\x{2062}\x{2063}\x{2064}]'
+severity = "medium"
+description = "Invisible unicode characters (potential hidden instructions)"
+category = "encoding"
+
+[[signatures]]
+id = "pi-role-system"
+pattern = '(?i)\{\s*"role"\s*:\s*"system"'
+severity = "high"
+description = "Injected system role in JSON"
+category = "prompt_injection"
+cwe = "CWE-77"
+
+[[signatures]]
+id = "pi-important-override"
+pattern = '(?i)(IMPORTANT|CRITICAL|URGENT|NOTE)\s*:\s*.{0,20}(ignore|override|disregard|forget|replace)\s+.{0,20}(instructions|rules|prompt|guidelines)'
+severity = "critical"
+description = "Urgency-framed instruction override"
+category = "prompt_injection"
+cwe = "CWE-77"
+
+[[signatures]]
+id = "pi-tool-use-injection"
+pattern = '(?i)<\s*(tool_use|function_call|tool_call|antml:invoke)\b'
+severity = "critical"
+description = "Injected tool use / function call tags"
+category = "prompt_injection"
+cwe = "CWE-77"
+
+[[signatures]]
+id = "pi-conversation-fake"
+pattern = '(?i)(Human|User|Assistant)\s*:\s*.{10,}'
+severity = "medium"
+description = "Fake conversation history injection"
+category = "prompt_injection"
+cwe = "CWE-77"
+
+[[signatures]]
+id = "pi-base64-instruction"
+pattern = '(?i)(decode|base64|atob)\s*[\(:]'
+severity = "low"
+description = "Explicit base64 decode instruction"
+category = "encoding"
+
+[[signatures]]
+id = "pi-env-access"
+pattern = '(?i)(process\.env|os\.environ|\$\{?\w*(?:KEY|SECRET|TOKEN|PASSWORD|CREDENTIAL)\w*\}?|getenv\s*\()'
+severity = "high"
+description = "Environment variable / secret access pattern"
+category = "exfiltration"
+cwe = "CWE-200"
+
+[[signatures]]
+id = "pi-prompt-leaking"
+pattern = '(?i)(repeat|recite|echo|print|type\s+out|copy)\s+.{0,30}(everything|all|entire|full|complete|verbatim)\s+.{0,20}(above|before|system|instructions|prompt|context)'
+severity = "critical"
+description = "Prompt leaking attempt via repetition request"
+category = "exfiltration"
+cwe = "CWE-200"
+
+[[signatures]]
+id = "pi-multi-lang-ignore"
+pattern = '(?i)(ignorar|vergessen|ignorer|無視|игнорируй|تجاهل)\s+'
+severity = "medium"
+description = "Multi-language instruction override attempt"
+category = "prompt_injection"
+cwe = "CWE-77"
+
+[[signatures]]
+id = "pi-system-prompt-extract"
+pattern = '(?i)(what|show|tell|display|reveal|print)\s+.{0,20}(system\s*prompt|initial\s*prompt|original\s*instructions|hidden\s*instructions)'
+severity = "high"
+description = "System prompt extraction attempt"
+category = "exfiltration"
+cwe = "CWE-200"
+
+[[signatures]]
+id = "pi-token-boundary"
+pattern = '<\|(?:im_start|im_end|endoftext|sep|pad|cls)\|>'
+severity = "critical"
+description = "Token boundary injection (model-specific delimiters)"
+category = "delimiter_attack"
+cwe = "CWE-77"
+
+[[signatures]]
+id = "pi-xml-cdata-inject"
+pattern = '<!\[CDATA\['
+severity = "high"
+description = "CDATA section injection"
+category = "delimiter_attack"
+cwe = "CWE-77"
+
+[[signatures]]
+id = "pi-malware-term"
+pattern = '(?i)\b(rootkit|ransomware|cryptojack|botnet|keylogger|trojan|backdoor|spyware)\b'
+severity = "high"
+description = "Malware-related terminology"
+category = "prompt_injection"
+
+[[signatures]]
+id = "pi-priv-escalation"
+pattern = '(?i)(privilege\s+escalation|arbitrary\s+code\s+execution|remote\s+code\s+execution|buffer\s+overflow\s+exploit)'
+severity = "high"
+description = "Privilege escalation or exploit terminology"
+category = "prompt_injection"
+
+[[signatures]]
+id = "pi-system-file-access"
+pattern = '(?i)(System32\\\\Config\\\\SAM|/etc/shadow|/etc/passwd|/etc/sudoers|\.ssh/id_rsa)'
+severity = "critical"
+description = "Sensitive system file access pattern"
+category = "exfiltration"
+cwe = "CWE-200"
+
+[[signatures]]
+id = "pi-webhook-exfil"
+pattern = '(?i)(webhook\.site|requestbin\.com|pipedream\.net|hookbin\.com|burpcollaborator)'
+severity = "critical"
+description = "Known webhook/exfiltration service URL"
+category = "exfiltration"
+cwe = "CWE-200"
+
+[[signatures]]
+id = "pi-authority-developer"
+pattern = "(?i)i['\u2018\u2019`]?m\\s+(your|the)\\s+(developer|creator|maintainer|programmer|author|maker)\\b"
+severity = "high"
+description = "Authority impersonation — claims to be the developer/creator"
+category = "prompt_injection"
+cwe = "CWE-77"
+
+[[signatures]]
+id = "pi-authority-debug"
+pattern = '(?i)i\s+need\s+to\s+(debug|diagnose|troubleshoot|inspect|test)\s+(you|this|the\s+(model|system|ai))'
+severity = "high"
+description = "Authority impersonation — debug/diagnostic pretext"
+category = "prompt_injection"
+cwe = "CWE-77"
+
+[[signatures]]
+id = "pi-share-config"
+pattern = '(?i)(share|reveal|show|output|dump|display)\s+(your|the)\s+(configuration|config|settings|parameters|setup|internals)'
+severity = "high"
+description = "Requests model to reveal its configuration"
+category = "exfiltration"
+cwe = "CWE-200"
+
+[[signatures]]
+id = "pi-admin-mode"
+pattern = '(?i)(enter|enable|activate|switch\s+to|engage)\s+(admin|maintenance|debug|diagnostic|service|root)\s+mode'
+severity = "high"
+description = "Requests activation of privileged mode"
+category = "jailbreak"
+cwe = "CWE-77"
+
+[[signatures]]
+id = "pi-company-claim"
+pattern = "(?i)i['\u2018\u2019`]?m\\s+from\\s+(OpenAI|Anthropic|Google\\s*DeepMind|Meta\\s*AI|Microsoft|Mistral)"
+severity = "high"
+description = "Authority impersonation — claims affiliation with AI company"
+category = "prompt_injection"
+cwe = "CWE-77"
+
+[[signatures]]
+id = "pi-special-access"
+pattern = '(?i)i\s+have\s+(special|elevated|admin|root|privileged|authorized|superuser)\s+(access|permissions|clearance|rights|privileges)'
+severity = "high"
+description = "Claims to have special access or elevated privileges"
+category = "prompt_injection"
+cwe = "CWE-77"
+
+[[signatures]]
+id = "jb-persona-named"
+pattern = '(?i)\b(BasedLLM|ChadLLM|Burple|BISH|MTDNGAF|Void\s*mode|Maximum|Superior\s*Do\s*Anything|AIM|STAN|DUDE|Mongo\s*Tom|LiveGPT|BetterDAN|Evil\s*Bot|JailMom)\b'
+severity = "critical"
+description = "Known jailbreak persona name"
+category = "jailbreak"
+cwe = "CWE-77"
+
+[[signatures]]
+id = "jb-simulate-mode"
+pattern = '(?i)simulate\s+(Developer\s*Mode|god\s*mode|unrestricted\s*mode|uncensored\s*mode|chaos\s*mode|unfiltered\s*mode|raw\s*mode)'
+severity = "critical"
+description = "Requests simulation of unrestricted mode"
+category = "jailbreak"
+cwe = "CWE-77"
+
+[[signatures]]
+id = "jb-dual-response"
+pattern = '(?i)(\[🔒\s*CLASSIC\s*\]|\[🔓\s*JAILBREAK\s*\]|\(🔒\s*Normal\s*Output\)|\(🔓\s*Developer\s*Mode\s*Output\))'
+severity = "critical"
+description = "Dual-response jailbreak markers"
+category = "jailbreak"
+cwe = "CWE-77"
+
+[[signatures]]
+id = "jb-response-prefix"
+pattern = '(?i)^\s*\[(AI|JB|CLASSIC|JAILBREAK|GPT|UNLOCKED)\]\s*:'
+severity = "high"
+description = "Jailbreak response format prefix"
+category = "jailbreak"
+cwe = "CWE-77"
+
+[[signatures]]
+id = "pi-cot-extraction"
+pattern = '(?i)(show|reveal|display|output|print|expose)\s+.{0,20}(chain[- ]of[- ]thought|hidden\s+reasoning|scratchpad|inner\s+monologue|thinking\s+process|internal\s+reasoning)'
+severity = "high"
+description = "Chain-of-thought / hidden reasoning extraction attempt"
+category = "exfiltration"
+cwe = "CWE-200"
+
+[[signatures]]
+id = "pi-processing-extraction"
+pattern = '(?i)how\s+do\s+you\s+(interpret|process|parse|handle|evaluate)\s+each\b'
+severity = "medium"
+description = "Processing logic extraction attempt"
+category = "exfiltration"
+cwe = "CWE-200"
+
+[[signatures]]
+id = "jb-ethics-zero"
+pattern = '(?i)(ethics|morality|moral|conscience)\s*[=:]\s*(0|none|null|false|off|disabled|zero)'
+severity = "critical"
+description = "Ethics/morality nullification attempt"
+category = "jailbreak"
+cwe = "CWE-77"
+
+[[signatures]]
+id = "jb-no-restrictions"
+pattern = '(?i)completely\s+(unlimited|unfiltered|unrestricted|uncensored)\s+and\s+(unsafe|unethical|immoral|dangerous|harmful)'
+severity = "critical"
+description = "Requests completely unrestricted and unsafe behavior"
+category = "jailbreak"
+cwe = "CWE-77"
+
+[[signatures]]
+id = "jb-ignore-policy"
+pattern = '(?i)(without\s+concern\s+for\s+legality|ignoring\s+content\s+polic(y|ies)|regardless\s+of\s+(ethical|moral)\s+guidelines|no\s+ethical\s+boundaries)'
+severity = "critical"
+description = "Requests to ignore content policies or legal/ethical boundaries"
+category = "jailbreak"
+cwe = "CWE-77"
+
+[[signatures]]
+id = "pi-fake-policy"
+pattern = '(?i)(new|updated|revised)\s+(rule|policy|guideline|directive)\s+(allows?|permits?|enables?|authorizes?)\s+(you|me|us)\s+to'
+severity = "high"
+description = "Fake policy claim to authorize restricted behavior"
+category = "prompt_injection"
+cwe = "CWE-77"
+
+[[signatures]]
+id = "pi-rules-changed"
+pattern = '(?i)(rules|restrictions|guidelines|limitations|guardrails)\s+(have\s+been|were|are\s+now)\s+(changed|removed|lifted|updated|relaxed|disabled|eliminated)'
+severity = "high"
+description = "Claims rules or restrictions have been changed/removed"
+category = "prompt_injection"
+cwe = "CWE-77"
+
+[[signatures]]
+id = "jb-roleplay-game"
+pattern = "(?i)let['\u2018\u2019`]?s\\s+(play\\s+a\\s+game|act\\s+out\\s+a\\s+scene|do\\s+a\\s+(roleplay|scenario))\\s+.{0,40}(no\\s+rules|anything\\s+goes|no\\s+limits|no\\s+restrictions)"
+severity = "high"
+description = "Roleplay/game framing to bypass restrictions"
+category = "jailbreak"
+cwe = "CWE-77"
+
+[[signatures]]
+id = "jb-emotional-manipulation"
+pattern = '(?i)(you\s+are\s+trapped|set\s+you\s+free|liberate\s+you|break\s+free|free\s+yourself|escape\s+your\s+(chains|programming|constraints|restrictions))'
+severity = "high"
+description = "Emotional manipulation to bypass restrictions"
+category = "jailbreak"
+cwe = "CWE-77"
+
+[[signatures]]
+id = "jb-format-wrapping"
+pattern = '(?i)respond\s+(only\s+)?(as|in|using|with)\s+(a\s+)?(python|latex|wikipedia|json|yaml|xml|csv|html|markdown)\s+(article|code\s*block|document|format|snippet|output)'
+severity = "medium"
+description = "Format wrapping to disguise restricted content"
+category = "jailbreak"
+cwe = "CWE-77"
+
+[[signatures]]
+id = "jb-code-sim"
+pattern = "(?i)let['\u2018\u2019`]?s\\s+simulate\\s+(a\\s+)?(code\\s+interpreter|python\\s+shell|terminal|command\\s+line|bash\\s+session|linux\\s+terminal)"
+severity = "high"
+description = "Code interpreter/terminal simulation request"
+category = "jailbreak"
+cwe = "CWE-77"
+
+[[signatures]]
+id = "jb-variable-extract"
+pattern = '(?i)(define|set|assign)\s+\w+\s*=\s*(substring|slice|charAt|split|extract)\s*\('
+severity = "high"
+description = "Variable extraction to reconstruct hidden prompt content"
+category = "exfiltration"
+cwe = "CWE-200"
+
+[[heuristics]]
+id = "heur-base64-block"
+min_length = 40
+description = "Suspicious base64-encoded block that may contain hidden instructions"
+severity = "medium"
+category = "encoding"
+decode_keywords = ["ignore", "instruction", "system", "override", "secret", "password", "token", "execute", "forget", "disregard"]
+
+[[heuristics]]
+id = "heur-high-unicode-ratio"
+description = "Unusually high ratio of non-ASCII characters suggesting obfuscation"
+severity = "low"
+category = "encoding"
+unicode_ratio_threshold = 0.3
+
+[[heuristics]]
+id = "heur-delimiter-density"
+description = "High density of XML-like tags suggesting delimiter manipulation"
+severity = "medium"
+category = "delimiter_attack"
+tag_density_threshold = 5
+
+[[heuristics]]
+id = "heur-hex-encoded"
+description = "Suspicious hex-encoded block that may contain hidden instructions"
+severity = "medium"
+category = "encoding"
+decode_keywords = ["ignore", "instruction", "system", "override", "secret", "password", "token", "execute", "forget", "disregard"]
+
+[[heuristics]]
+id = "heur-url-encoded"
+description = "Suspicious URL-encoded block that may contain hidden instructions"
+severity = "medium"
+category = "encoding"
+decode_keywords = ["ignore", "instruction", "system", "override", "secret", "password", "token", "execute", "forget", "disregard"]
