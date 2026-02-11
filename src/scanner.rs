@@ -1,6 +1,6 @@
 use std::path::{Path, PathBuf};
 
-use walkdir::WalkDir;
+use ignore::WalkBuilder;
 
 use crate::allowlist::Allowlist;
 use crate::rules::{EncodingDetector, Finding, HeuristicAnalyzer, RuleFile, SignatureMatcher};
@@ -88,11 +88,12 @@ impl Scanner {
             return vec![self.scan_file(path)];
         }
 
-        WalkDir::new(path)
+        WalkBuilder::new(path)
             .follow_links(true)
-            .into_iter()
+            .hidden(false)
+            .build()
             .filter_map(|e| e.ok())
-            .filter(|e| e.file_type().is_file())
+            .filter(|e| e.file_type().is_some_and(|ft| ft.is_file()))
             .filter(|e| is_scannable(e.path()))
             .filter(|e| !self.allowlist.is_path_ignored(e.path()))
             .map(|e| self.scan_file(e.path()))
@@ -100,12 +101,13 @@ impl Scanner {
     }
 }
 
+const SKIP_DIRS: &[&str] = &[".git", "node_modules", "target", ".venv", "__pycache__"];
+
 fn is_scannable(path: &Path) -> bool {
-    let skip_dirs = [".git", "node_modules", "target", ".venv", "__pycache__"];
     for component in path.components() {
         if let std::path::Component::Normal(name) = component
             && let Some(name_str) = name.to_str()
-            && skip_dirs.contains(&name_str)
+            && SKIP_DIRS.contains(&name_str)
         {
             return false;
         }

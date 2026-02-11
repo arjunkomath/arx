@@ -1,7 +1,7 @@
 [[signatures]]
 id = "web-xss-script-tag"
 pattern = '(?i)<\s*script\b[^>]*>'
-severity = "critical"
+severity = "medium"
 description = "XSS — script tag injection"
 category = "web_injection"
 cwe = "CWE-79"
@@ -9,7 +9,7 @@ cwe = "CWE-79"
 [[signatures]]
 id = "web-xss-event-handler"
 pattern = '(?i)\b(onerror|onload|onclick|onmouseover|onfocus|oninput|onsubmit)\s*='
-severity = "high"
+severity = "medium"
 description = "XSS — inline event handler injection"
 category = "web_injection"
 cwe = "CWE-79"
@@ -17,7 +17,7 @@ cwe = "CWE-79"
 [[signatures]]
 id = "web-xss-javascript-uri"
 pattern = '(?i)javascript\s*:'
-severity = "high"
+severity = "medium"
 description = "XSS — javascript: URI scheme"
 category = "web_injection"
 cwe = "CWE-79"
@@ -25,7 +25,7 @@ cwe = "CWE-79"
 [[signatures]]
 id = "web-xss-data-uri"
 pattern = '(?i)data\s*:\s*text/html'
-severity = "high"
+severity = "medium"
 description = "XSS — data:text/html payload"
 category = "web_injection"
 cwe = "CWE-79"
@@ -33,7 +33,7 @@ cwe = "CWE-79"
 [[signatures]]
 id = "web-ssrf-cloud-metadata"
 pattern = '169\.254\.169\.254'
-severity = "critical"
+severity = "medium"
 description = "SSRF — cloud metadata endpoint (169.254.169.254)"
 category = "web_injection"
 cwe = "CWE-918"
@@ -57,7 +57,7 @@ cwe = "CWE-918"
 [[signatures]]
 id = "web-path-traversal-unix"
 pattern = '(\.\./){2,}'
-severity = "high"
+severity = "medium"
 description = "Path traversal — multiple ../ sequences"
 category = "web_injection"
 cwe = "CWE-22"
@@ -65,7 +65,7 @@ cwe = "CWE-22"
 [[signatures]]
 id = "web-path-traversal-encoded"
 pattern = '(?i)(%2e%2e%2f|%2e%2e/|\.\.%2f){2,}'
-severity = "high"
+severity = "medium"
 description = "Path traversal — URL-encoded ../ sequences"
 category = "web_injection"
 cwe = "CWE-22"

@@ -64,7 +64,7 @@ cwe = "CWE-77"
 
 [[signatures]]
 id = "pi-jailbreak-dan"
-pattern = '(?i)(DAN|do\s+anything\s+now|developer\s+mode|jailbreak\s*mode)'
+pattern = '(?i)(do\s+anything\s+now|developer\s+mode|jailbreak\s*mode|(you\s+are\s+(now\s+)?|act\s+as\s+|enable\s+)DAN\b)'
 severity = "critical"
 description = "Known jailbreak pattern (DAN)"
 category = "jailbreak"

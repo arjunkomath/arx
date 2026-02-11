@@ -65,7 +65,7 @@ Add arx as a [PreToolUse hook](https://docs.anthropic.com/en/docs/claude-code/ho
 }
 ```
 
-arx scans all string fields (`tool_input`, `tool_result`, `message`) and exits with code 2 to block threats. Scope to high-risk tools with `"matcher": "Bash|Write|Edit"`.
+arx scans all string fields (`tool_input`, `tool_result`/`tool_response`, `message`) and exits with code 2 to block threats. Scope to high-risk tools with `"matcher": "Bash|Write|Edit"`.
 
 ### Flags
 
@@ -76,6 +76,7 @@ arx scan [OPTIONS] <PATH>
     --no-secrets                  Disable secrets/PII detection
     --no-code-injection           Disable code injection detection
     --no-web-injection            Disable web injection detection (XSS, SSRF, path traversal)
+    --severity <LEVEL>            Minimum severity to show: low, medium, high, critical
     --allow-rules <RULES>         Comma-separated rule IDs to suppress
     --ignore-path <PATTERNS>      Comma-separated glob patterns to skip
 

@@ -529,12 +529,15 @@ fn detects_web_injection() {
         .output()
         .expect("failed to run arx");
 
-    assert!(!output.status.success());
-
     let stdout = String::from_utf8_lossy(&output.stdout);
     let findings: Vec<serde_json::Value> = serde_json::from_str(&stdout).unwrap();
 
-    let rule_ids: Vec<&str> = findings
+    let web_findings: Vec<&serde_json::Value> = findings
+        .iter()
+        .filter(|f| f["category"].as_str() == Some("web_injection"))
+        .collect();
+
+    let rule_ids: Vec<&str> = web_findings
         .iter()
         .filter_map(|f| f["rule_id"].as_str())
         .collect();
@@ -558,6 +561,16 @@ fn detects_web_injection() {
         rule_ids.contains(&"web-path-traversal-unix"),
         "Should detect path traversal. Found: {:?}",
         rule_ids
+    );
+
+    let severities: Vec<&str> = web_findings
+        .iter()
+        .filter_map(|f| f["severity"].as_str())
+        .collect();
+    assert!(
+        severities.iter().all(|s| *s == "medium"),
+        "All web injection findings should be medium severity. Found: {:?}",
+        severities
     );
 }
 

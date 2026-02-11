@@ -49,6 +49,9 @@ enum Commands {
         #[arg(long)]
         no_web_injection: bool,
 
+        #[arg(long, value_enum)]
+        severity: Option<ThresholdLevel>,
+
         #[arg(long, value_delimiter = ',')]
         allow_rules: Vec<String>,
 
@@ -110,18 +113,28 @@ fn main() {
             no_secrets,
             no_code_injection,
             no_web_injection,
+            severity,
             allow_rules,
             ignore_path,
         } => {
             let rule_file = build_rules(rules, no_secrets, no_code_injection, no_web_injection);
             let allowlist = Allowlist::new(&allow_rules, &ignore_path);
             let scanner = Scanner::with_allowlist(&rule_file, allowlist);
-            let results = scanner.scan_path(&path);
+            let min_severity: Severity = severity.map(Into::into).unwrap_or(Severity::Low);
+
+            let results: Vec<_> = scanner
+                .scan_path(&path)
+                .into_iter()
+                .map(|mut r| {
+                    r.findings.retain(|f| f.severity >= min_severity);
+                    r
+                })
+                .collect();
 
             let has_threats = results
                 .iter()
                 .flat_map(|r| &r.findings)
-                .any(|f| f.severity >= rules::Severity::High);
+                .any(|f| f.severity >= Severity::High);
 
             output::print_results(&results, json);
 

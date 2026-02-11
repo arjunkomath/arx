@@ -23,7 +23,7 @@ pub struct HookEvent {
     pub tool_name: Option<String>,
     #[serde(default)]
     pub tool_input: Option<serde_json::Value>,
-    #[serde(default)]
+    #[serde(default, alias = "tool_response")]
     pub tool_result: Option<serde_json::Value>,
     #[serde(default)]
     pub message: Option<String>,
