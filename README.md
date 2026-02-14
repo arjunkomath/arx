@@ -15,14 +15,22 @@ A fast, offline security scanner that protects AI agents from prompt injection, 
 
 ## Install
 
+### Homebrew
+
 ```sh
-cargo install --path .
+brew install arjunkomath/tap/arx
 ```
 
-Or build from source:
+### Shell script
 
 ```sh
-cargo build --release
+curl --proto '=https' --tlsv1.2 -LsSf https://github.com/arjunkomath/arx/releases/download/v0.1.0/arx-installer.sh | sh
+```
+
+### Build from source
+
+```sh
+cargo install --path .
 ```
 
 ## Usage
