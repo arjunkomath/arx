@@ -66,29 +66,35 @@ impl Scanner {
         findings
     }
 
-    pub fn scan_file(&self, path: &Path) -> ScanResult {
-        let findings = match std::fs::read_to_string(path) {
-            Ok(content) => self.scan_content(&content),
-            Err(_) => Vec::new(),
-        };
-        ScanResult {
+    pub fn scan_file(&self, path: &Path) -> Result<ScanResult, std::io::Error> {
+        let content = std::fs::read_to_string(path)?;
+        let findings = self.scan_content(&content);
+        Ok(ScanResult {
             path: path.to_path_buf(),
             findings,
-        }
+        })
     }
 
-    pub fn scan_path(&self, path: &Path) -> Vec<ScanResult> {
-        if path.is_file() {
-            if self.allowlist.is_path_ignored(path) {
-                return vec![ScanResult {
-                    path: path.to_path_buf(),
-                    findings: Vec::new(),
-                }];
-            }
-            return vec![self.scan_file(path)];
+    pub fn scan_path(&self, path: &Path) -> Result<Vec<ScanResult>, std::io::Error> {
+        if !path.exists() {
+            return Err(std::io::Error::new(
+                std::io::ErrorKind::NotFound,
+                format!("path not found: {}", path.display()),
+            ));
         }
 
-        WalkBuilder::new(path)
+        if path.is_file() {
+            if self.allowlist.is_path_ignored(path) {
+                return Ok(vec![ScanResult {
+                    path: path.to_path_buf(),
+                    findings: Vec::new(),
+                }]);
+            }
+            return Ok(vec![self.scan_file(path)?]);
+        }
+
+        let mut results = Vec::new();
+        for entry in WalkBuilder::new(path)
             .follow_links(true)
             .hidden(false)
             .build()
@@ -96,8 +102,15 @@ impl Scanner {
             .filter(|e| e.file_type().is_some_and(|ft| ft.is_file()))
             .filter(|e| is_scannable(e.path()))
             .filter(|e| !self.allowlist.is_path_ignored(e.path()))
-            .map(|e| self.scan_file(e.path()))
-            .collect()
+        {
+            match self.scan_file(entry.path()) {
+                Ok(result) => results.push(result),
+                Err(e) => {
+                    eprintln!("arx: warning: {}: {e}", entry.path().display());
+                }
+            }
+        }
+        Ok(results)
     }
 }
 

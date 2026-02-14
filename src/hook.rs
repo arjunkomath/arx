@@ -5,14 +5,10 @@ use crate::rules::Severity;
 use crate::scanner::Scanner;
 
 const HIGH_RISK_TOOLS: &[&str] = &[
-    "Bash",
     "bash",
-    "Write",
     "write",
     "execute",
-    "Execute",
     "shell",
-    "Shell",
     "run_command",
     "terminal",
 ];
@@ -45,7 +41,7 @@ pub fn run_hook(
     let is_high_risk = event
         .tool_name
         .as_deref()
-        .map(|t| HIGH_RISK_TOOLS.contains(&t))
+        .map(|t| HIGH_RISK_TOOLS.contains(&t.to_lowercase().as_str()))
         .unwrap_or(false);
 
     let effective_threshold = if is_high_risk {
@@ -113,7 +109,7 @@ fn extract_scannable_text(event: &HookEvent) -> Vec<String> {
     }
 
     if let Some(ref message) = event.message
-        && message.len() > 10
+        && !message.is_empty()
     {
         texts.push(message.clone());
     }
@@ -124,7 +120,7 @@ fn extract_scannable_text(event: &HookEvent) -> Vec<String> {
 fn collect_string_values(value: &serde_json::Value, out: &mut Vec<String>) {
     match value {
         serde_json::Value::String(s) => {
-            if s.len() > 10 {
+            if !s.is_empty() {
                 out.push(s.clone());
             }
         }

@@ -76,7 +76,8 @@ arx scan [OPTIONS] <PATH>
     --no-secrets                  Disable secrets/PII detection
     --no-code-injection           Disable code injection detection
     --no-web-injection            Disable web injection detection (XSS, SSRF, path traversal)
-    --severity <LEVEL>            Minimum severity to show: low, medium, high, critical
+    --severity <LEVEL>            Minimum severity to display: low, medium, high, critical
+                                  (display-only filter — exit code is based on all findings)
     --allow-rules <RULES>         Comma-separated rule IDs to suppress
     --ignore-path <PATTERNS>      Comma-separated glob patterns to skip
 
@@ -88,6 +89,7 @@ arx hook [OPTIONS]
     --no-web-injection            Disable web injection detection (XSS, SSRF, path traversal)
     --threshold <LEVEL>           Minimum severity to block: low, medium, high (default), critical
     --allow-rules <RULES>         Comma-separated rule IDs to suppress
+    --fail-open                   Allow tool calls through on errors (default: fail closed)
 ```
 
 ### Inline suppression
@@ -98,7 +100,35 @@ Add `arx:allow` on a line to suppress findings for that line:
 sk-test-key-for-unit-testing  arx:allow
 ```
 
+## Project configuration
+
+Create an `arx.toml` in your project root to share settings across your team. CLI flags always take precedence over config file values.
+
+```toml
+[scan]
+severity = "medium"
+no_secrets = false
+allow_rules = ["pi-ignore-instructions"]
+ignore_paths = ["tests/fixtures/**", "docs/**"]
+
+[hook]
+threshold = "high"
+fail_open = false
+allow_rules = []
+
+# Custom rules can be defined inline
+[[signatures]]
+id = "custom-api-endpoint"
+pattern = '(?i)internal-api\.company\.com'
+severity = "high"
+description = "Internal API endpoint reference"
+category = "custom"
+cwe = "CWE-200"
+```
+
 ## Custom rules
+
+Load additional rules from a separate TOML file:
 
 ```toml
 [[signatures]]
@@ -114,11 +144,13 @@ cwe = "CWE-200"
 arx scan project/ --rules my-rules.toml
 ```
 
+Custom rules defined in `arx.toml` (via `[[signatures]]` and `[[heuristics]]`) are loaded automatically without needing `--rules`.
+
 ## Hook mode details
 
 High-risk tools (`Bash`, `Write`, `execute`) automatically lower the blocking threshold to `medium` regardless of `--threshold`.
 
-Exit codes: `0` — clean, `2` — threats blocked.
+Exit codes: `0` — clean, `2` — threats blocked or error (fail-closed by default). Use `--fail-open` to allow on errors.
 
 ## Performance
 

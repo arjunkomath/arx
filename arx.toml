@@ -1,0 +1,35 @@
+# arx.toml - Project configuration for arx
+# CLI flags always take precedence over these settings.
+
+[scan]
+# severity = "low"                   # minimum severity to display: low, medium, high, critical
+# no_secrets = false                 # disable secrets/PII detection
+# no_code_injection = false          # disable code injection detection
+# no_web_injection = false           # disable web injection detection
+# allow_rules = []                   # rule IDs to suppress
+# ignore_paths = ["tests/fixtures/**"]  # glob patterns to skip
+
+[hook]
+# threshold = "high"                 # minimum severity to block: low, medium, high, critical
+# fail_open = false                  # allow tool calls through on errors
+# no_secrets = false
+# no_code_injection = false
+# no_web_injection = false
+# allow_rules = []
+
+# Custom signature rules (uncomment and modify as needed)
+# [[signatures]]
+# id = "custom-rule-1"
+# pattern = '(?i)my-custom-pattern'
+# severity = "high"
+# description = "Custom detection rule"
+# category = "custom"
+# cwe = "CWE-200"
+
+# Custom heuristic rules
+# [[heuristics]]
+# id = "custom-heur-1"
+# description = "Custom heuristic"
+# severity = "medium"
+# category = "custom"
+# decode_keywords = ["secret"]
