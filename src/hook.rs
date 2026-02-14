@@ -125,11 +125,7 @@ fn resolve_skill_dirs() -> Vec<PathBuf> {
     dirs
 }
 
-const SKILL_SCAN_CATEGORIES: &[&str] = &[
-    "prompt_injection",
-    "jailbreak",
-    "delimiter_attack",
-];
+const SKILL_SCAN_CATEGORIES: &[&str] = &["prompt_injection", "jailbreak", "delimiter_attack"];
 
 fn scan_skill_dirs(
     scanner: &Scanner,

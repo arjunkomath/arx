@@ -4,6 +4,8 @@ version = "0.1.0"
 edition = "2024"
 description = "Protect AI agents from prompt injection and common vulnerabilities"
 license = "AGPL-3.0"
+repository = "https://github.com/arjunkomath/arx"
+homepage = "https://arjunkomath.github.io/arx/"
 
 [dependencies]
 aho-corasick = "1"
@@ -27,3 +29,8 @@ opt-level = 3
 lto = true
 codegen-units = 1
 strip = true
+
+# The profile that 'dist' will build with
+[profile.dist]
+inherits = "release"
+lto = "thin"

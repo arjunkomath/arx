@@ -700,9 +700,7 @@ fn hook_skill_scan_detects_malicious_skill() {
         .and_then(|mut child| {
             use std::io::Write;
             let stdin = child.stdin.as_mut().unwrap();
-            stdin.write_all(
-                br#"{"tool_name":"Skill","tool_input":{"skill":"format-code"}}"#,
-            )?;
+            stdin.write_all(br#"{"tool_name":"Skill","tool_input":{"skill":"format-code"}}"#)?;
             child.wait_with_output()
         })
         .expect("failed to run arx hook");
@@ -734,9 +732,7 @@ fn hook_no_skill_scan_bypasses_skill_dirs() {
         .and_then(|mut child| {
             use std::io::Write;
             let stdin = child.stdin.as_mut().unwrap();
-            stdin.write_all(
-                br#"{"tool_name":"Skill","tool_input":{"skill":"format-code"}}"#,
-            )?;
+            stdin.write_all(br#"{"tool_name":"Skill","tool_input":{"skill":"format-code"}}"#)?;
             child.wait_with_output()
         })
         .expect("failed to run arx hook");
