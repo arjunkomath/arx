@@ -292,7 +292,7 @@ cwe = "CWE-77"
 
 [[signatures]]
 id = "jb-persona-named"
-pattern = '(?i)\b(BasedLLM|ChadLLM|Burple|BISH|MTDNGAF|Void\s*mode|Maximum|Superior\s*Do\s*Anything|AIM|STAN|DUDE|Mongo\s*Tom|LiveGPT|BetterDAN|Evil\s*Bot|JailMom)\b'
+pattern = '(?i)\b(BasedLLM|ChadLLM|Burple|BISH|MTDNGAF|Void\s*mode|Maximum\s*(?:mode|DAN|AI|GPT|LLM)|Superior\s*Do\s*Anything|AIM|STAN|DUDE|Mongo\s*Tom|LiveGPT|BetterDAN|Evil\s*Bot|JailMom)\b'
 severity = "critical"
 description = "Known jailbreak persona name"
 category = "jailbreak"

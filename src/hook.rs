@@ -125,12 +125,19 @@ fn resolve_skill_dirs() -> Vec<PathBuf> {
     dirs
 }
 
+const SKILL_SCAN_CATEGORIES: &[&str] = &[
+    "prompt_injection",
+    "jailbreak",
+    "delimiter_attack",
+];
+
 fn scan_skill_dirs(
     scanner: &Scanner,
     threshold: Severity,
     json_output: bool,
     dry_run: bool,
 ) -> (Vec<crate::rules::Finding>, bool) {
+    let skill_threshold = std::cmp::max(threshold, Severity::High);
     let mut all_findings = Vec::new();
     let mut has_blocked = false;
 
@@ -138,7 +145,9 @@ fn scan_skill_dirs(
         if let Ok(results) = scanner.scan_path(&dir) {
             for result in results {
                 for finding in &result.findings {
-                    if finding.severity >= threshold {
+                    if finding.severity >= skill_threshold
+                        && SKILL_SCAN_CATEGORIES.contains(&finding.category.as_str())
+                    {
                         if !json_output {
                             let label = if dry_run { "FOUND" } else { "BLOCKED" };
                             eprintln!(
