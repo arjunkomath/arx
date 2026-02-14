@@ -84,6 +84,12 @@ enum Commands {
 
         #[arg(long)]
         fail_open: bool,
+
+        #[arg(long)]
+        dry_run: bool,
+
+        #[arg(long)]
+        no_skill_scan: bool,
     },
 }
 
@@ -228,6 +234,8 @@ fn main() {
             json,
             allow_rules,
             fail_open,
+            dry_run,
+            no_skill_scan,
         } => {
             let hook_cfg = config.hook.as_ref();
 
@@ -277,12 +285,21 @@ fn main() {
                 Severity::High
             };
 
-            match hook::run_hook(&scanner, eff_threshold, json) {
+            let eff_no_skill_scan =
+                no_skill_scan || hook_cfg.and_then(|h| h.no_skill_scan).unwrap_or(false);
+
+            match hook::run_hook(&scanner, eff_threshold, json, dry_run, eff_no_skill_scan) {
                 Ok(true) => process::exit(0),
-                Ok(false) => process::exit(2),
+                Ok(false) => {
+                    if dry_run {
+                        process::exit(0)
+                    } else {
+                        process::exit(2)
+                    }
+                }
                 Err(e) => {
                     eprintln!("arx: hook error: {e}");
-                    if eff_fail_open {
+                    if eff_fail_open || dry_run {
                         process::exit(0)
                     } else {
                         process::exit(2)

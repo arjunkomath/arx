@@ -65,7 +65,7 @@ Add arx as a [PreToolUse hook](https://docs.anthropic.com/en/docs/claude-code/ho
 }
 ```
 
-arx scans all string fields (`tool_input`, `tool_result`/`tool_response`, `message`) and exits with code 2 to block threats. Scope to high-risk tools with `"matcher": "Bash|Write|Edit"`.
+An empty matcher runs arx before every tool call. This ensures skill directory scanning catches malicious skills before the agent can act on them — even if the skill content was already loaded into context. arx scans all string fields (`tool_input`, `tool_result`/`tool_response`, `message`) and exits with code 2 to block threats.
 
 ### Flags
 
@@ -90,6 +90,8 @@ arx hook [OPTIONS]
     --threshold <LEVEL>           Minimum severity to block: low, medium, high (default), critical
     --allow-rules <RULES>         Comma-separated rule IDs to suppress
     --fail-open                   Allow tool calls through on errors (default: fail closed)
+    --dry-run                     Report findings but never block (always exits 0)
+    --no-skill-scan               Disable automatic scanning of agent skill directories
 ```
 
 ### Inline suppression
@@ -151,6 +153,12 @@ Custom rules defined in `arx.toml` (via `[[signatures]]` and `[[heuristics]]`) a
 High-risk tools (`Bash`, `Write`, `execute`) automatically lower the blocking threshold to `medium` regardless of `--threshold`.
 
 Exit codes: `0` — clean, `2` — threats blocked or error (fail-closed by default). Use `--fail-open` to allow on errors.
+
+### Skill directory scanning
+
+In hook mode, arx automatically scans all known agent skill directories for threats. Skills (SKILL.md files) are a cross-agent standard supported by 35+ agent frameworks. Since poisoned skills can contain prompt injection that gets loaded before any tool call, arx proactively scans both project-local skill directories (e.g. `.claude/skills/`, `.cursor/skills/`, `.goose/skills/`) and global skill directories (e.g. `~/.claude/skills/`, `~/.cursor/skills/`). Only directories that exist on disk are scanned.
+
+Use `--no-skill-scan` to disable this behavior, or set `no_skill_scan = true` under `[hook]` in `arx.toml`.
 
 ## Performance
 

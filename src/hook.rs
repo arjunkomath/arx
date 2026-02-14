@@ -1,8 +1,84 @@
 use serde::Deserialize;
 use std::io::Read;
+use std::path::PathBuf;
 
 use crate::rules::Severity;
 use crate::scanner::Scanner;
+
+const PROJECT_SKILL_DIRS: &[&str] = &[
+    ".agents/skills",
+    ".agent/skills",
+    ".augment/skills",
+    ".claude/skills",
+    "skills",
+    ".cline/skills",
+    ".codebuddy/skills",
+    ".commandcode/skills",
+    ".continue/skills",
+    ".crush/skills",
+    ".cursor/skills",
+    ".factory/skills",
+    ".goose/skills",
+    ".junie/skills",
+    ".iflow/skills",
+    ".kilocode/skills",
+    ".kiro/skills",
+    ".kode/skills",
+    ".mcpjam/skills",
+    ".vibe/skills",
+    ".mux/skills",
+    ".openhands/skills",
+    ".pi/skills",
+    ".qoder/skills",
+    ".qwen/skills",
+    ".roo/skills",
+    ".trae/skills",
+    ".windsurf/skills",
+    ".zencoder/skills",
+    ".neovate/skills",
+    ".pochi/skills",
+    ".adal/skills",
+];
+
+const GLOBAL_SKILL_DIRS: &[&str] = &[
+    ".config/agents/skills",
+    ".gemini/antigravity/skills",
+    ".augment/skills",
+    ".claude/skills",
+    ".moltbot/skills",
+    ".cline/skills",
+    ".codebuddy/skills",
+    ".codex/skills",
+    ".commandcode/skills",
+    ".continue/skills",
+    ".config/crush/skills",
+    ".cursor/skills",
+    ".factory/skills",
+    ".gemini/skills",
+    ".copilot/skills",
+    ".config/goose/skills",
+    ".junie/skills",
+    ".iflow/skills",
+    ".kilocode/skills",
+    ".kiro/skills",
+    ".kode/skills",
+    ".mcpjam/skills",
+    ".vibe/skills",
+    ".mux/skills",
+    ".config/opencode/skills",
+    ".openhands/skills",
+    ".pi/agent/skills",
+    ".qoder/skills",
+    ".qwen/skills",
+    ".roo/skills",
+    ".trae/skills",
+    ".trae-cn/skills",
+    ".codeium/windsurf/skills",
+    ".zencoder/skills",
+    ".neovate/skills",
+    ".pochi/skills",
+    ".adal/skills",
+];
 
 const HIGH_RISK_TOOLS: &[&str] = &[
     "bash",
@@ -11,6 +87,7 @@ const HIGH_RISK_TOOLS: &[&str] = &[
     "shell",
     "run_command",
     "terminal",
+    "skill",
 ];
 
 #[derive(Debug, Deserialize)]
@@ -25,10 +102,74 @@ pub struct HookEvent {
     pub message: Option<String>,
 }
 
+fn resolve_skill_dirs() -> Vec<PathBuf> {
+    let mut dirs = Vec::new();
+
+    let cwd = std::env::current_dir().unwrap_or_default();
+    for rel in PROJECT_SKILL_DIRS {
+        let path = cwd.join(rel);
+        if std::fs::metadata(&path).is_ok() {
+            dirs.push(path);
+        }
+    }
+
+    if let Some(home) = dirs::home_dir() {
+        for rel in GLOBAL_SKILL_DIRS {
+            let path = home.join(rel);
+            if std::fs::metadata(&path).is_ok() {
+                dirs.push(path);
+            }
+        }
+    }
+
+    dirs
+}
+
+fn scan_skill_dirs(
+    scanner: &Scanner,
+    threshold: Severity,
+    json_output: bool,
+    dry_run: bool,
+) -> (Vec<crate::rules::Finding>, bool) {
+    let mut all_findings = Vec::new();
+    let mut has_blocked = false;
+
+    for dir in resolve_skill_dirs() {
+        if let Ok(results) = scanner.scan_path(&dir) {
+            for result in results {
+                for finding in &result.findings {
+                    if finding.severity >= threshold {
+                        if !json_output {
+                            let label = if dry_run { "FOUND" } else { "BLOCKED" };
+                            eprintln!(
+                                "arx: {} — {} ({}/{}) in {}",
+                                label,
+                                finding.description,
+                                finding.category,
+                                finding.rule_id,
+                                result.path.display()
+                            );
+                            if let Some(ref matched) = finding.matched_text {
+                                eprintln!("arx: matched: \"{}\"", matched);
+                            }
+                        }
+                        has_blocked = true;
+                    }
+                }
+                all_findings.extend(result.findings);
+            }
+        }
+    }
+
+    (all_findings, has_blocked)
+}
+
 pub fn run_hook(
     scanner: &Scanner,
     threshold: Severity,
     json_output: bool,
+    dry_run: bool,
+    no_skill_scan: bool,
 ) -> Result<bool, Box<dyn std::error::Error>> {
     let mut input = String::new();
     std::io::stdin().read_to_string(&mut input)?;
@@ -60,9 +201,10 @@ pub fn run_hook(
         for finding in &findings {
             if finding.severity >= effective_threshold {
                 if !json_output {
+                    let label = if dry_run { "FOUND" } else { "BLOCKED" };
                     eprintln!(
-                        "arx: BLOCKED — {} ({}/{})",
-                        finding.description, finding.category, finding.rule_id
+                        "arx: {} — {} ({}/{})",
+                        label, finding.description, finding.category, finding.rule_id
                     );
                     if let Some(ref matched) = finding.matched_text {
                         eprintln!("arx: matched: \"{}\"", matched);
@@ -72,6 +214,15 @@ pub fn run_hook(
             }
         }
         all_findings.extend(findings);
+    }
+
+    if !no_skill_scan {
+        let (skill_findings, skill_blocked) =
+            scan_skill_dirs(scanner, effective_threshold, json_output, dry_run);
+        all_findings.extend(skill_findings);
+        if skill_blocked {
+            has_blocked = true;
+        }
     }
 
     if json_output {

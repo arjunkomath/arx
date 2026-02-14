@@ -34,6 +34,7 @@ pub struct HookConfig {
     pub no_code_injection: Option<bool>,
     pub no_web_injection: Option<bool>,
     pub allow_rules: Option<Vec<String>>,
+    pub no_skill_scan: Option<bool>,
 }
 
 impl Config {

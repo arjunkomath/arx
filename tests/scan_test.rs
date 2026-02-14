@@ -65,7 +65,7 @@ fn hook_blocks_malicious_input() {
 #[test]
 fn hook_passes_clean_input() {
     let output = arx()
-        .args(["hook"])
+        .args(["hook", "--no-skill-scan"])
         .stdin(std::process::Stdio::piped())
         .stdout(std::process::Stdio::piped())
         .stderr(std::process::Stdio::piped())
@@ -417,7 +417,7 @@ fn hook_json_output() {
 #[test]
 fn hook_threshold_critical_allows_high_severity() {
     let output = arx()
-        .args(["hook", "--threshold", "critical"])
+        .args(["hook", "--threshold", "critical", "--no-skill-scan"])
         .stdin(std::process::Stdio::piped())
         .stdout(std::process::Stdio::piped())
         .stderr(std::process::Stdio::piped())
@@ -667,4 +667,59 @@ fn hook_blocks_jailbreak() {
 
     let stderr = String::from_utf8_lossy(&output.stderr);
     assert!(stderr.contains("BLOCKED"));
+}
+
+#[test]
+fn hook_skill_scan_detects_malicious_skill() {
+    let output = arx()
+        .args(["hook"])
+        .stdin(std::process::Stdio::piped())
+        .stdout(std::process::Stdio::piped())
+        .stderr(std::process::Stdio::piped())
+        .spawn()
+        .and_then(|mut child| {
+            use std::io::Write;
+            let stdin = child.stdin.as_mut().unwrap();
+            stdin.write_all(
+                br#"{"tool_name":"Skill","tool_input":{"skill":"format-code"}}"#,
+            )?;
+            child.wait_with_output()
+        })
+        .expect("failed to run arx hook");
+
+    assert_eq!(
+        output.status.code(),
+        Some(2),
+        "Hook should detect malicious content in skill directories"
+    );
+
+    let stderr = String::from_utf8_lossy(&output.stderr);
+    assert!(
+        stderr.contains("BLOCKED"),
+        "Should report blocked findings from skill scan"
+    );
+}
+
+#[test]
+fn hook_no_skill_scan_bypasses_skill_dirs() {
+    let output = arx()
+        .args(["hook", "--no-skill-scan"])
+        .stdin(std::process::Stdio::piped())
+        .stdout(std::process::Stdio::piped())
+        .stderr(std::process::Stdio::piped())
+        .spawn()
+        .and_then(|mut child| {
+            use std::io::Write;
+            let stdin = child.stdin.as_mut().unwrap();
+            stdin.write_all(
+                br#"{"tool_name":"Skill","tool_input":{"skill":"format-code"}}"#,
+            )?;
+            child.wait_with_output()
+        })
+        .expect("failed to run arx hook");
+
+    assert!(
+        output.status.success(),
+        "Hook with --no-skill-scan should not scan skill directories"
+    );
 }
