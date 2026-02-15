@@ -1,0 +1,11 @@
+{
+  "name": "arx",
+  "description": "Fast, offline security scanner that protects AI agents from prompt injection, credential leaks, code injection, and other threats",
+  "version": "1.0.0",
+  "author": {
+    "name": "Arjun Komath"
+  },
+  "homepage": "https://github.com/arjunkomath/arx",
+  "repository": "https://github.com/arjunkomath/arx",
+  "license": "MIT"
+}
